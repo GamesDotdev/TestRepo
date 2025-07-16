@@ -199,11 +199,14 @@
 
             // --- Textures ---
             const textureLoader = new THREE.TextureLoader();
-            const dayMap = textureLoader.load('https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/land_ocean_ice_cloud_2048.jpg');
+
+            const onError = (err) => { console.error('Error loading texture:', err); };
+
+            const dayMap = textureLoader.load('https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/land_ocean_ice_cloud_2048.jpg', undefined, undefined, onError);
             dayMap.colorSpace = THREE.SRGBColorSpace;
-            const nightMap = textureLoader.load('https://www.solarsystemscope.com/textures/download/2k_earth_nightmap.jpg');
+            const nightMap = textureLoader.load('https://www.solarsystemscope.com/textures/download/2k_earth_nightmap.jpg', undefined, undefined, onError);
             nightMap.colorSpace = THREE.SRGBColorSpace;
-            const cloudMap = textureLoader.load('https://www.solarsystemscope.com/textures/download/2k_earth_clouds.jpg');
+            const cloudMap = textureLoader.load('https://www.solarsystemscope.com/textures/download/2k_earth_clouds.jpg', undefined, undefined, onError);
 
             // --- Earth ---
             const earthMaterial = new THREE.MeshStandardMaterial({
