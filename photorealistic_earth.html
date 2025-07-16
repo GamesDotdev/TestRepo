@@ -242,8 +242,8 @@
                     float nightIntensity = smoothstep(0.2, 0.4, nightFactor) * (1.0 - dayIntensity);
                     
                     // Combine day and night
-                    gl_FragColor.rgb = mix(gl_FragColor.rgb, nightColor, nightIntensity);
-                    gl_FragColor.rgb *= dayIntensity;
+                    vec3 finalColor = mix(gl_FragColor.rgb, nightColor, nightIntensity);
+                    gl_FragColor.rgb = finalColor * dayIntensity;
                     `
                 );
             };
