@@ -204,9 +204,9 @@
 
             const dayMap = textureLoader.load('https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/land_ocean_ice_cloud_2048.jpg', undefined, undefined, onError);
             dayMap.colorSpace = THREE.SRGBColorSpace;
-            const nightMap = textureLoader.load('https://www.solarsystemscope.com/textures/download/2k_earth_nightmap.jpg', undefined, undefined, onError);
+            const nightMap = textureLoader.load('https://unpkg.com/three-globe@2.27.0/example/img/earth-night.jpg', undefined, undefined, onError);
             nightMap.colorSpace = THREE.SRGBColorSpace;
-            const cloudMap = textureLoader.load('https://www.solarsystemscope.com/textures/download/2k_earth_clouds.jpg', undefined, undefined, onError);
+            const cloudMap = textureLoader.load('https://unpkg.com/three-globe@2.27.0/example/img/earth-clouds.png', undefined, undefined, onError);
 
             // --- Earth ---
             const earthMaterial = new THREE.MeshStandardMaterial({
@@ -220,30 +220,25 @@
             
             earthMaterial.onBeforeCompile = (shader) => {
                 shader.uniforms.sunDirection = { value: new THREE.Vector3().copy(sunLight.position).normalize() };
-                shader.uniforms.nightTexture = { value: nightMap };
                 
                 shader.fragmentShader = `
                     uniform vec3 sunDirection;
-                    uniform sampler2D nightTexture;
                     varying vec3 vNormal;
-                    varying vec2 vUv;
                 ` + shader.fragmentShader.replace(
                     `#include <dithering_fragment>`,
                     `#include <dithering_fragment>
                     
                     float dayFactor = dot(normalize(vNormal), sunDirection);
-                    float nightFactor = dot(normalize(vNormal), -sunDirection);
+                    float nightFactor = 1.0 - dayFactor; // Simple inverse for night
 
-                    // Smooth transition from day to night
-                    float dayIntensity = smoothstep(-0.25, 0.25, dayFactor);
-                    
-                    // Get night lights
-                    vec3 nightColor = texture2D(nightTexture, vUv).rgb;
-                    float nightIntensity = smoothstep(0.2, 0.4, nightFactor) * (1.0 - dayIntensity);
-                    
-                    // Combine day and night
-                    vec3 finalColor = mix(gl_FragColor.rgb, nightColor, nightIntensity);
-                    gl_FragColor.rgb = finalColor * dayIntensity;
+                    // Smooth transition for night lights
+                    float nightLightIntensity = smoothstep(0.0, 0.5, nightFactor);
+
+                    // Apply night lights only when it's dark
+                    #ifdef USE_EMISSIVEMAP
+                        vec4 emissiveColor = texture2D( emissiveMap, vUv );
+                        outgoingLight += emissiveColor.rgb * nightLightIntensity;
+                    #endif
                     `
                 );
             };
