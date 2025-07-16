@@ -213,35 +213,10 @@
                 map: dayMap,
                 emissiveMap: nightMap,
                 emissive: new THREE.Color(0.9, 0.8, 0.6),
-                emissiveIntensity: 0, // Start with no emissive, will be controlled by shader
+                emissiveIntensity: 0, // Will be controlled dynamically
                 metalness: 0.1,
                 roughness: 0.8
             });
-            
-            earthMaterial.onBeforeCompile = (shader) => {
-                shader.uniforms.sunDirection = { value: new THREE.Vector3().copy(sunLight.position).normalize() };
-                
-                shader.fragmentShader = `
-                    uniform vec3 sunDirection;
-                    varying vec3 vNormal;
-                ` + shader.fragmentShader.replace(
-                    `#include <dithering_fragment>`,
-                    `#include <dithering_fragment>
-                    
-                    float dayFactor = dot(normalize(vNormal), sunDirection);
-                    float nightFactor = 1.0 - dayFactor; // Simple inverse for night
-
-                    // Smooth transition for night lights
-                    float nightLightIntensity = smoothstep(0.0, 0.5, nightFactor);
-
-                    // Apply night lights only when it's dark
-                    #ifdef USE_EMISSIVEMAP
-                        vec4 emissiveColor = texture2D( emissiveMap, vUv );
-                        outgoingLight += emissiveColor.rgb * nightLightIntensity;
-                    #endif
-                    `
-                );
-            };
 
             earth = new THREE.Mesh(new THREE.SphereGeometry(EARTH_RADIUS, 64, 64), earthMaterial);
             scene.add(earth);
@@ -333,7 +308,7 @@
                 maxZoom: 19
             }).addTo(map);
 
-            fetch('https://d2ad6b4ur77vp.cloudfront.net/naturalearth-3.3.0/ne_50m_populated_places.geojson')
+            fetch('https://geojson.xyz/natural-earth-110m.json')
                 .then(response => response.json())
                 .then(data => {
                     L.geoJSON(data, {
@@ -418,6 +393,13 @@
             earth.rotation.y += 0.00015;
             clouds.rotation.y += 0.0002;
             stars.rotation.y += 0.00005;
+
+            // Dynamic emissive intensity for night lights
+            const sunDirection = new THREE.Vector3().copy(sunLight.position).normalize();
+            const earthNormal = new THREE.Vector3(0, 0, 1); // Assuming Earth is aligned with Z-axis
+            const dotProduct = earthNormal.dot(sunDirection);
+            // Adjust emissive intensity based on sun direction (more intense at night side)
+            earth.material.emissiveIntensity = Math.max(0, -dotProduct * 2 + 0.5); // Adjust multiplier and offset as needed
 
             controls.update();
             composer.render();
