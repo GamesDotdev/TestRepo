@@ -212,7 +212,7 @@
             // --- Earth ---
             const earthMaterial = new THREE.MeshBasicMaterial({
                 color: 0x0000ff // Blue color for testing
-            });
+            }); // Trigger new workflow
 
             earth = new THREE.Mesh(new THREE.SphereGeometry(EARTH_RADIUS, 64, 64), earthMaterial);
             scene.add(earth);
