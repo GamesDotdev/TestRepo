@@ -92,6 +92,7 @@
         import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
         import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
         import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+        import { latLonToVector3 } from './src/utils.js';
 
         // --- Basic Setup ---
         let scene, camera, renderer, controls, composer;
@@ -345,14 +346,11 @@
             geoJsonMarkers.push(marker);
         }
 
-        function latLonToVector3(lat, lon, radius) {
-            const phi = (90 - lat) * (Math.PI / 180);
-            const theta = (lon + 180) * (Math.PI / 180);
+        import { latLonToVector3 } from './src/utils.js';
 
-            const x = -(radius * Math.sin(phi) * Math.cos(theta));
-            const z = (radius * Math.sin(phi) * Math.sin(theta));
-            const y = (radius * Math.cos(phi));
-
+        // Modify the function to return a THREE.Vector3
+        function latLonToVector3Three(lat, lon, radius) {
+            const { x, y, z } = latLonToVector3(lat, lon, radius);
             return new THREE.Vector3(x, y, z);
         }
 
