@@ -210,9 +210,14 @@
             const cloudMap = textureLoader.load('https://unpkg.com/three-globe@2.27.0/example/img/earth-clouds.png', undefined, undefined, onError);
 
             // --- Earth ---
-            const earthMaterial = new THREE.MeshBasicMaterial({
-                color: 0x0000ff // Blue color for testing
-            }); // Trigger new workflow
+            const earthMaterial = new THREE.MeshStandardMaterial({
+                map: dayMap,
+                emissiveMap: nightMap,
+                emissive: new THREE.Color(0.9, 0.8, 0.6),
+                emissiveIntensity: 0, // Will be controlled dynamically
+                metalness: 0.1,
+                roughness: 0.8
+            }); // Trigger new workflow // Trigger new workflow
 
             earth = new THREE.Mesh(new THREE.SphereGeometry(EARTH_RADIUS, 64, 64), earthMaterial);
             scene.add(earth);
