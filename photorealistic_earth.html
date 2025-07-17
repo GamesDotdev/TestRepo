@@ -92,7 +92,7 @@
         import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
         import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
         import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
-        import { latLonToVector3 } from './src/utils.js';
+        
 
         // --- Basic Setup ---
         let scene, camera, renderer, controls, composer;
@@ -210,13 +210,8 @@
             const cloudMap = textureLoader.load('https://unpkg.com/three-globe@2.27.0/example/img/earth-clouds.png', undefined, undefined, onError);
 
             // --- Earth ---
-            const earthMaterial = new THREE.MeshStandardMaterial({
-                map: dayMap,
-                emissiveMap: nightMap,
-                emissive: new THREE.Color(0.9, 0.8, 0.6),
-                emissiveIntensity: 0, // Will be controlled dynamically
-                metalness: 0.1,
-                roughness: 0.8
+            const earthMaterial = new THREE.MeshBasicMaterial({
+                color: 0x0000ff // Blue color for testing
             });
 
             earth = new THREE.Mesh(new THREE.SphereGeometry(EARTH_RADIUS, 64, 64), earthMaterial);
@@ -288,11 +283,11 @@
             const renderPass = new RenderPass(scene, camera);
             composer.addPass(renderPass);
 
-            const bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 0.5, 0.2, 0.1);
-            composer.addPass(bloomPass);
+            // const bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 0.5, 0.2, 0.1);
+            // composer.addPass(bloomPass);
 
-            const outputPass = new OutputPass();
-            composer.addPass(outputPass);
+            // const outputPass = new OutputPass();
+            // composer.addPass(outputPass);
 
             // --- Leaflet Map ---
             initLeaflet();
@@ -345,8 +340,6 @@
             earth.add(marker);
             geoJsonMarkers.push(marker);
         }
-
-        import { latLonToVector3 } from './src/utils.js';
 
         // Modify the function to return a THREE.Vector3
         function latLonToVector3Three(lat, lon, radius) {
