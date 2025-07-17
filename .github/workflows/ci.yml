@@ -16,3 +16,12 @@ jobs:
         cache: 'npm'
     - run: npm ci
     - run: npm test
+    - name: Install Playwright Browsers
+      run: npx playwright install --with-deps
+    - name: Start HTTP Server
+      run: npx http-server . -p 8080 & # Start server in background
+    - name: Run Playwright E2E tests
+      run: npm run test:e2e
+    - name: Stop HTTP Server # This step might not be strictly necessary as the job will terminate, but good practice
+      if: always()
+      run: kill $(jobs -p)
