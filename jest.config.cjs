@@ -6,6 +6,10 @@ module.exports = {
     "/node_modules/",
     "/e2e/"
   ],
+  testPathIgnorePatterns: [
+    "/node_modules/",
+    "/e2e/"
+  ],
   transform: {
     "^.+\.js$": "babel-jest"
   },
